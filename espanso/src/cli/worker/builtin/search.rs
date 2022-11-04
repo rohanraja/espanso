@@ -29,7 +29,7 @@ pub fn create_match_trigger_search_bar(
 ) -> BuiltInMatch {
   BuiltInMatch {
     id: generate_next_builtin_id(),
-    label: "Open search bar",
+    label: "Open search bar - rohan1",
     triggers: trigger.map(|trigger| vec![trigger]).unwrap_or_default(),
     hotkey,
     action: |_| EventType::ShowSearchBar,

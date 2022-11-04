@@ -76,7 +76,7 @@ impl Middleware for ContextMenuMiddleware {
           }),
           MenuItem::Simple(SimpleMenuItem {
             id: CONTEXT_ITEM_OPEN_SEARCH,
-            label: "Open search bar".to_string(),
+            label: "Open search bar rohan5".to_string(),
           }),
           MenuItem::Separator,
           MenuItem::Simple(SimpleMenuItem {

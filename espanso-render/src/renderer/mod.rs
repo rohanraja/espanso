@@ -29,6 +29,7 @@ use thiserror::Error;
 
 use self::util::{inject_variables_into_params, render_variables};
 
+use log::info;
 mod resolve;
 mod util;
 
@@ -52,6 +53,14 @@ impl<'a> DefaultRenderer<'a> {
   }
 }
 
+fn run2() -> Result<(), ureq::Error> {
+  let _body: String = ureq::get("http://localhost:8080")
+    .set("Example-Header", "header value")
+    .call()?
+    .into_string()?;
+  Ok(())
+}
+
 impl<'a> Renderer for DefaultRenderer<'a> {
   fn render(
     &self,
@@ -59,6 +68,10 @@ impl<'a> Renderer for DefaultRenderer<'a> {
     context: &Context,
     options: &RenderOptions,
   ) -> RenderResult {
+    info!("Renderer called!!");
+
+    let _res2 = run2();
+
     let body = if VAR_REGEX.is_match(&template.body) {
       // Convert "global" variable type aliases when needed
       let local_variables: Vec<&Variable> =
@@ -113,6 +126,7 @@ impl<'a> Renderer for DefaultRenderer<'a> {
             return RenderResult::Error(RendererError::MissingSubMatch.into());
           }
         } else if let Some(extension) = self.extensions.get(&variable.var_type) {
+          info!("Eval extensions!");
           let variable_params = if variable.inject_vars {
             match inject_variables_into_params(&variable.params, &scope) {
               Ok(augmented_params) => Cow::Owned(augmented_params),
