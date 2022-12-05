@@ -27,11 +27,14 @@ use log::{error, warn};
 use regex::{Captures, Regex};
 use thiserror::Error;
 
+use hyper::Client;
+
 use self::util::{inject_variables_into_params, render_variables};
 
 use log::info;
 mod resolve;
 mod util;
+use std::time::Instant;
 
 lazy_static! {
   pub(crate) static ref VAR_REGEX: Regex =
@@ -53,12 +56,32 @@ impl<'a> DefaultRenderer<'a> {
   }
 }
 
-fn run2() -> Result<(), ureq::Error> {
-  let _body: String = ureq::get("http://localhost:8080")
-    .set("Example-Header", "header value")
-    .call()?
-    .into_string()?;
-  Ok(())
+#[tokio::main]
+async fn req2(template: &Template) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    // This is where we will setup our HTTP client requests.
+
+info!("Starting req!!");
+    let cmdBody = &template.body;
+    let client = Client::new();
+
+    let now = Instant::now();
+
+    // let mut res = reqwest::blocking::get("http://127.0.0.1:8000/openEavAdmin?orgName=AURORA2");
+
+// Parse an `http::Uri`...
+// let uri = "http://127.0.0.1:8005/run?commandName=SMSBuildPlugin&repoPath=smside1".parse()?;
+let uri = cmdBody.parse()?;
+
+// Await the response...
+let mut resp = client.get(uri).await?;
+
+    let elapsed = now.elapsed();
+    info!("Elapsed: {:.2?}", elapsed);
+
+println!("Response: {}", resp.status());
+
+info!("Ending req!!");
+    Ok(())
 }
 
 impl<'a> Renderer for DefaultRenderer<'a> {
@@ -70,7 +93,14 @@ impl<'a> Renderer for DefaultRenderer<'a> {
   ) -> RenderResult {
     info!("Renderer called!!");
 
-    let _res2 = run2();
+    let cmdBody = &template.body;
+
+    info!("{}", cmdBody);
+
+    if cmdBody.contains("http://127.0.0.1:800") {
+       req2(&template);
+       return RenderResult::Success("".to_string());
+    }
 
     let body = if VAR_REGEX.is_match(&template.body) {
       // Convert "global" variable type aliases when needed

@@ -46,6 +46,13 @@ You will find the resulting AppImage in the `target/linux/AppImage/out` folder.
 
 ### Binary
 
+cargo make --profile release --env NO_X11=true build-binary
+
+cargo make --profile debug --env NO_X11=true build-windows-portable
+
+ .\target\debug\espanso.exe start --unmanaged
+ .\target\release\espanso.exe start --unmanaged
+
 TODO
 
 ## Compiling on Wayland
