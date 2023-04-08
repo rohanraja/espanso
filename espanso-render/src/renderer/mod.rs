@@ -57,11 +57,11 @@ impl<'a> DefaultRenderer<'a> {
 }
 
 #[tokio::main]
-async fn req2(template: &Template) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+async fn req2(cmdBody: &String) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     // This is where we will setup our HTTP client requests.
 
 info!("Starting req!!");
-    let cmdBody = &template.body;
+    // let cmdBody = &template.body;
     let client = Client::new();
 
     let now = Instant::now();
@@ -93,14 +93,6 @@ impl<'a> Renderer for DefaultRenderer<'a> {
   ) -> RenderResult {
     info!("Renderer called!!");
 
-    let cmdBody = &template.body;
-
-    info!("{}", cmdBody);
-
-    if cmdBody.contains("http://127.0.0.1:800") {
-       req2(&template);
-       return RenderResult::Success("".to_string());
-    }
 
     let body = if VAR_REGEX.is_match(&template.body) {
       // Convert "global" variable type aliases when needed
@@ -248,6 +240,15 @@ impl<'a> Renderer for DefaultRenderer<'a> {
       }
     };
 
+    let cmdBody = &template.body;
+
+    info!("{}", cmdBody);
+
+    if cmdBody.contains("http://127.0.0.1:800") {
+      //  req2(&template);
+       req2(&body_with_casing);
+       return RenderResult::Success("".to_string());
+    }
     RenderResult::Success(body_with_casing)
   }
 }
